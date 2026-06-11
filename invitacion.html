@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Estás invitado a mi Cumpleaños!</title>
+    <style>
+        /* Paleta de colores: Morado, Negro y Azul */
+        :root {
+            --bg-dark: #0a0a16;
+            --purple: #6a1b9a;
+            --blue: #0277bd;
+            --correct: #4caf50;
+            --present: #ffeb3b;
+            --absent: #37474f;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fondo Animado Simple */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, #0a0a16, #1a0033, #001a33);
+            background-size: 400% 400%;
+            animation: gradientMove 15s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Contenedor Principal */
+        .container {
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(10, 10, 22, 0.8);
+            border: 2px solid var(--purple);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(106, 27, 154, 0.5);
+            z-index: 1;
+        }
+
+        h1, h2 {
+            color: #fff;
+            text-shadow: 0 0 10px var(--blue);
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin: 15px 0;
+        }
+
+        .pista {
+            color: #00e5ff;
+            font-style: italic;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        /* Tablero de Wordle (7 letras para M-A-M-I-T-A-S) */
+        .grid {
+            display: grid;
+            grid-template-rows: repeat(6, 1fr);
+            gap: 5px;
+            margin: 20px auto;
+            max-width: 350px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .tile {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 2px solid var(--blue);
+            border-radius: 5px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            background-color: rgba(2, 119, 189, 0.1);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        /* Teclado Virtual */
+        .keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 20px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .key {
+            background-color: #263238;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            flex: 1;
+            max-width: 40px;
+        }
+
+        .key.wide {
+            max-width: 60px;
+        }
+
+        /* Estados de Wordle */
+        .tile.correct { background-color: var(--correct); border-color: var(--correct); }
+        .tile.present { background-color: var(--present); border-color: var(--present); color: black; }
+        .tile.absent { background-color: var(--absent); border-color: var(--absent); }
+
+        /* Pantalla de Victoria */
+        .success-message {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--purple), var(--blue));
+            border-radius: 10px;
+            animation: popIn 0.5s ease out;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .btn-mapa {
+            background-color: #fff;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-animation"></div>
+
+    <div class="container">
+        <h2>🎉 ¡Estás Invitado! 🎉</h2>
+        <p>Te invito a festejar mi cumpleaños este sábado 13 de junio en un lugar muy especial.</p>
+        <p><strong>Adivina el lugar y te espero ahí a las 9 pm hasta que nos saquen del lugar.</strong></p>
+        <p class="pista">*Pista: es un antro en ciudad Neza</p>
+
+        <!-- Tablero Wordle (6 intentos, 7 letras) -->
+        <div class="grid" id="grid"></div>
+
+        <!-- Teclado en pantalla -->
+        <div class="keyboard" id="keyboard"></div>
+
+        <!-- Mensaje oculto que se revela al ganar -->
+        <div class="success-message" id="successMessage">
+            <h3>¡EXCELENTE ADIVINASTE! 🥳🍻</h3>
+            <p>El lugar es: <strong>MAMITAS NIGHT CLUB</strong></p>
+            <p>📍 Av. Chimalhuacán, Cd. Nezahualcóyotl.</p>
+            <a href="https://maps.app.goo.gl/LQUJksJZVHuePgfy7" target="_blank" class="btn-mapa">🗺️ Ver Ubicación en Google Maps</a>
+        </div>
+    </div>
+
+    <script>
+        const ANSWER = "MAMITAS";
+        const WORD_LENGTH = 7;
+        const MAX_ATTEMPTS = 6;
+        
+        let currentAttempt = 0;
+        let currentLetter = 0;
+        let gameOver = false;
+        
+        let boardState = Array(MAX_ATTEMPTS).fill().map(() => Array(WORD_LENGTH).fill(""));
+
+        // Inicializar Tablero
+        const grid = document.getElementById("grid");
+        for (let i = 0; i < MAX_ATTEMPTS; i++) {
+            const row = document.createElement("div");
+            row.className = "row";
+            for (let j = 0; j < WORD_LENGTH; j++) {
+                const tile = document.createElement("div");
+                tile.className = "tile";
+                tile.id = `tile-${i}-${j}`;
+                row.appendChild(tile);
+            }
+            grid.appendChild(row);
+        }
+
+        // Inicializar Teclado
+        const keyboardRows = [
+            ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+            ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ñ"],
+            ["Enviar", "Z", "X", "C", "V", "B", "N", "M", "Borrar"]
+        ];
+
+        const keyboardContainer = document.getElementById("keyboard");
+        keyboardRows.forEach(row => {
+            const rowDiv = document.createElement("div");
+            rowDiv.className = "keyboard-row";
+            row.forEach(key => {
+                const button = document.createElement("button");
+                button.textContent = key;
+                button.className = "key";
+                if (key === "Enviar" || key === "Borrar") button.classList.add("wide");
+                button.addEventListener("click", () => handleKeyPress(key));
+                rowDiv.appendChild(button);
+            });
+            keyboardContainer.appendChild(rowDiv);
+        });
+
+        // Capturar teclado físico también
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") handleKeyPress("Enviar");
+            else if (e.key === "Backspace") handleKeyPress("Borrar");
+            else if (/^[a-zA-ZñÑ]$/.test(e.key)) handleKeyPress(e.key.toUpperCase());
+        });
+
+        function handleKeyPress(key) {
+            if (gameOver) return;
+
+            if (key === "Borrar") {
+                if (currentLetter > 0) {
+                    currentLetter--;
+                    boardState[currentAttempt][currentLetter] = "";
+                    updateBoard();
+                }
+            } else if (key === "Enviar") {
+                if (currentLetter === WORD_LENGTH) {
+                    checkRow();
+                }
+            } else if (currentLetter < WORD_LENGTH && key !== "Enviar" && key !== "Borrar") {
+                boardState[currentAttempt][currentLetter] = key;
+                currentLetter++;
+                updateBoard();
+            }
+        }
+
+        function updateBoard() {
+            for (let j = 0; j < WORD_LENGTH; j++) {
+                const tile = document.getElementById(`tile-${currentAttempt}-${j}`);
+                tile.textContent = boardState[currentAttempt][j];
+            }
+        }
+
+        function checkRow() {
+            const row = boardState[currentAttempt];
+            const guess = row.join("");
+            
+            let tempAnswer = ANSWER.split("");
+            
+            // Primer pasada: marcar correctas (verdes)
+            for (let j = 0; j < WORD_LENGTH; j++) {
+                const tile = document.getElementById(`tile-${currentAttempt}-${j}`);
+                if (guess[j] === ANSWER[j]) {
+                    tile.classList.add("correct");
+                    tempAnswer[j] = null;
+                }
+            }
+
+            // Segunda pasada: marcar presentes (amarillas) o ausentes (grises)
+            for (let j = 0; j < WORD_LENGTH; j++) {
+                const tile = document.getElementById(`tile-${currentAttempt}-${j}`);
+                if (!tile.classList.contains("correct")) {
+                    const index = tempAnswer.indexOf(guess[j]);
+                    if (index !== -1) {
+                        tile.classList.add("present");
+                        tempAnswer[index] = null;
+                    } else {
+                        tile.classList.add("absent");
+                    }
+                }
+            }
+
+            if (guess === ANSWER) {
+                gameOver = true;
+                document.getElementById("successMessage").style.display = "block";
+                document.getElementById("keyboard").style.display = "none";
+                return;
+            }
+
+            currentAttempt++;
+            currentLetter = 0;
+
+            if (currentAttempt === MAX_ATTEMPTS) {
+                gameOver = true;
+                alert("¡Se te acabaron los intentos! Pero como eres mi amigo/a, la palabra era MAMITAS. ¡Te espero ahí!");
+                document.getElementById("successMessage").style.display = "block";
+                document.getElementById("keyboard").style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
