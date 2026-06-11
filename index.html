@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>¡Estás invitado a mi Cumpleaños!</title>
     <style>
         /* Paleta de colores: Morado, Negro y Azul */
@@ -15,9 +15,13 @@
             --absent: #37474f;
         }
 
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-dark);
             color: #ffffff;
@@ -27,6 +31,7 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            padding: 10px;
         }
 
         /* Fondo Animado Simple */
@@ -48,60 +53,62 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Contenedor Principal */
+        /* Contenedor Principal Ajustado */
         .container {
-            max-width: 500px;
-            width: 90%;
+            width: 100%;
+            max-width: 450px;
             text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(10, 10, 22, 0.8);
+            margin: 10px auto;
+            padding: 15px;
+            background: rgba(10, 10, 22, 0.85);
             border: 2px solid var(--purple);
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(106, 27, 154, 0.5);
             z-index: 1;
         }
 
-        h1, h2 {
+        h2 {
             color: #fff;
             text-shadow: 0 0 10px var(--blue);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 1.5rem;
         }
 
         p {
-            font-size: 1.1rem;
-            line-height: 1.5;
-            margin: 15px 0;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin: 10px 0;
         }
 
         .pista {
             color: #00e5ff;
             font-style: italic;
             font-weight: bold;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
-        /* Tablero de Wordle (7 letras para M-A-M-I-T-A-S) */
+        /* Tablero Adaptable Automáticamente */
         .grid {
             display: grid;
             grid-template-rows: repeat(6, 1fr);
-            gap: 5px;
-            margin: 20px auto;
-            max-width: 350px;
+            gap: 4px;
+            margin: 15px auto;
+            width: 100%;
+            max-width: 340px; /* Evita que se desparrame en pantallas grandes */
         }
 
         .row {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
+            gap: 4px;
         }
 
         .tile {
             width: 100%;
-            aspect-ratio: 1;
+            aspect-ratio: 1; /* Mantiene las casillas perfectamente cuadradas */
             border: 2px solid var(--blue);
             border-radius: 5px;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -111,18 +118,20 @@
             transition: background-color 0.3s, border-color 0.3s;
         }
 
-        /* Teclado Virtual */
+        /* Teclado Ultra-Responsivo para Móviles */
         .keyboard {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            margin-top: 20px;
+            gap: 5px;
+            margin-top: 15px;
+            width: 100%;
         }
 
         .keyboard-row {
             display: flex;
             justify-content: center;
-            gap: 4px;
+            gap: 3px;
+            width: 100%;
         }
 
         .key {
@@ -130,17 +139,22 @@
             color: white;
             border: none;
             border-radius: 4px;
-            padding: 12px 8px;
-            font-size: 0.9rem;
+            height: 45px;
+            font-size: 0.85rem;
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
             flex: 1;
-            max-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Evita el zoom molesto al tocar en iOS */
+            touch-action: manipulation; 
         }
 
         .key.wide {
-            max-width: 60px;
+            flex: 1.5;
+            font-size: 0.75rem;
         }
 
         /* Estados de Wordle */
@@ -151,15 +165,15 @@
         /* Pantalla de Victoria */
         .success-message {
             display: none;
-            margin-top: 25px;
-            padding: 20px;
+            margin-top: 20px;
+            padding: 15px;
             background: linear-gradient(135deg, var(--purple), var(--blue));
             border-radius: 10px;
-            animation: popIn 0.5s ease out;
+            animation: popIn 0.5s ease;
         }
 
         @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
+            0% { transform: scale(0.9); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
@@ -173,8 +187,17 @@
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
-            margin-top: 15px;
+            margin-top: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Ajustes extra para pantallas críticamente pequeñas (celulares viejos o chicos) */
+        @media (max-width: 360px) {
+            h2 { font-size: 1.3rem; }
+            p { font-size: 0.85rem; }
+            .tile { font-size: 1rem; }
+            .key { height: 40px; font-size: 0.75rem; }
+            .key.wide { font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -197,7 +220,7 @@
         <!-- Mensaje oculto que se revela al ganar -->
         <div class="success-message" id="successMessage">
             <h3>¡EXCELENTE ADIVINASTE! 🥳🍻</h3>
-            <p>El lugar es: <strong>MAMITAS NIGHT CLUB</strong></p>
+            <p>El lugar es: <br><strong>MAMITAS NIGHT CLUB</strong></p>
             <p>📍 Av. Chimalhuacán, Cd. Nezahualcóyotl.</p>
             <a href="https://maps.app.goo.gl/LQUJksJZVHuePgfy7" target="_blank" class="btn-mapa">🗺️ Ver Ubicación en Google Maps</a>
         </div>
@@ -244,13 +267,16 @@
                 button.textContent = key;
                 button.className = "key";
                 if (key === "Enviar" || key === "Borrar") button.classList.add("wide");
-                button.addEventListener("click", () => handleKeyPress(key));
+                button.addEventListener("click", (e) => {
+                    e.preventDefault(); // Previene comportamientos raros en móvil
+                    handleKeyPress(key);
+                });
                 rowDiv.appendChild(button);
             });
             keyboardContainer.appendChild(rowDiv);
         });
 
-        // Capturar teclado físico también
+        // Capturar teclado físico
         window.addEventListener("keydown", (e) => {
             if (e.key === "Enter") handleKeyPress("Enviar");
             else if (e.key === "Backspace") handleKeyPress("Borrar");
@@ -290,7 +316,6 @@
             
             let tempAnswer = ANSWER.split("");
             
-            // Primer pasada: marcar correctas (verdes)
             for (let j = 0; j < WORD_LENGTH; j++) {
                 const tile = document.getElementById(`tile-${currentAttempt}-${j}`);
                 if (guess[j] === ANSWER[j]) {
@@ -299,7 +324,6 @@
                 }
             }
 
-            // Segunda pasada: marcar presentes (amarillas) o ausentes (grises)
             for (let j = 0; j < WORD_LENGTH; j++) {
                 const tile = document.getElementById(`tile-${currentAttempt}-${j}`);
                 if (!tile.classList.contains("correct")) {
